@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1002931541420",
+    "project_id": "locatorapp-b7741",
+    "storage_bucket": "locatorapp-b7741.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1002931541420:android:be40c834963467060d1609",
+        "android_client_info": {
+          "package_name": "com.example.locatorapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8T2Oq2XIUEYq9yQc5etFkeNDjUIWSA8k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
