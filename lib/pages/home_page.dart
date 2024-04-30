@@ -1,35 +1,59 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-import '../get_user_location.dart';
-
+import 'package:locatorapp/get_user_location.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key});
 
   final CameraPosition _cameraPosition =
-  const CameraPosition(target: LatLng(0.3338, 32.5514), zoom: 14.0);
+      const CameraPosition(target: LatLng(0.3338, 32.5514), zoom: 14.0);
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser!;
-    final String? photoUrl = user.photoURL;
+    late Future<String?> _photoUrlFuture;
+
+    // Fetch the user's photo URL from Firebase Storage using the user's UID
+    firebase_storage.Reference storageRef = firebase_storage
+        .FirebaseStorage.instance
+        .ref()
+        .child('user_photos')
+        .child('${user.uid}.jpg');
+    _photoUrlFuture = storageRef.getDownloadURL();
 
     return Scaffold(
-      appBar: CustomAppBar(userPhotoUrl: photoUrl),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: FutureBuilder<String?>(
+          future: _photoUrlFuture,
+          builder: (context, snapshot) {
+            final userPhotoUrl = snapshot.data;
+            return CustomAppBar(userPhotoUrl: userPhotoUrl);
+          },
+        ),
+      ),
       body: Stack(
         children: [
           GoogleMap(initialCameraPosition: _cameraPosition),
           Positioned(
-            bottom: 16.0,
-            right: 16.0,
-            child: FloatingActionButton(
-              onPressed: () {
-                // Method getting current location for user
-                // This is just a placeholder. The actual implementation will be done in the GetUserLocation widget.
-              },
-              child: const Icon(Icons.radio_button_off),
+            bottom: 0,
+            right: 0,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FloatingActionButton(
+                  onPressed: () {
+                    // Method getting current location for user
+                    // This is just a placeholder. The actual implementation will be done in the GetUserLocation widget.
+                  },
+                  child: const Icon(Icons.radio_button_off),
+                ),
+                const SizedBox(
+                    height:
+                        16), // Adjust the space between the button and the bottom edge
+              ],
             ),
           ),
           GetUserLocation(
@@ -44,7 +68,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? userPhotoUrl;
 
@@ -53,17 +76,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Row(
-        children: [
-          const Text('My Locator App'),
-          const Spacer(), // Add Spacer widget to push the user photo to the right
-          if (userPhotoUrl != null)
-            CircleAvatar(
-              backgroundImage: NetworkImage(userPhotoUrl!),
-            ),
-        ],
-      ),
+      title: const Text('My Locator App'),
       actions: [
+        CircleAvatar(
+          // Load the user photo from the URL if available, otherwise use a placeholder
+          backgroundImage: userPhotoUrl != null
+              ? NetworkImage(userPhotoUrl!)
+              : const NetworkImage(
+                  'https://avatar.iran.liara.run/public/boy?username=Ash'),
+        ),
         IconButton(
           onPressed: () {
             FirebaseAuth.instance.signOut();
@@ -77,4 +98,3 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
-

@@ -82,27 +82,36 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       );
 
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      // Sign up the user
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
 
-      Navigator.pop(context);
+      // Get the user's UID from the userCredential
+      String userUid = userCredential.user!.uid;
+
+      // Use the user's UID to name the photo in Firebase Storage
+      String filename = '$userUid.jpg';
+
+      // Update the path to store the image with the correct filename
+      firebase_storage.Reference storageRef = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('user_photos')
+          .child(filename);
+      await storageRef.putFile(_image!);
+      photoUrl = await storageRef.getDownloadURL();
+
+
+      Navigator.pop(context); // Close the loading dialog
     } catch (e) {
       print("Error during sign up: $e");
       showErrorMessage("An error occurred during sign up");
-      Navigator.pop(context);
+      Navigator.pop(context); // Close the loading dialog
     }
   }
 
-  // Future<void> getImage() async {
-  //   final picker = ImagePicker();
-  //   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-  //
-  //   setState(() {
-  //     _image = pickedFile != null ? File(pickedFile.path) : null;
-  //   });
-  // }
+
 
 
   @override
@@ -116,6 +125,17 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 25),
+
+                const SizedBox(height: 25),
+                Text(
+                  'Create Account',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 25),
+
                 GestureDetector(
                   onTap: getImage,
                   child: CircleAvatar(
@@ -136,15 +156,6 @@ class _RegisterPageState extends State<RegisterPage> {
                       size: 50,
                       color: Colors.grey,
                     ),
-                  ),
-                ),
-                const SizedBox(height: 25),
-                const SizedBox(height: 25),
-                Text(
-                  'Create Account',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 16,
                   ),
                 ),
                 const SizedBox(height: 25),
