@@ -55,7 +55,8 @@ class _RegisterPageState extends State<RegisterPage> {
     try {
       String? photoUrl;
       if (_image != null) {
-        firebase_storage.Reference storageRef = firebase_storage.FirebaseStorage.instance
+        firebase_storage.Reference storageRef = firebase_storage
+            .FirebaseStorage.instance
             .ref()
             .child('user_photos')
             .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
@@ -83,7 +84,8 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       // Sign up the user
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
@@ -95,13 +97,13 @@ class _RegisterPageState extends State<RegisterPage> {
       String filename = '$userUid.jpg';
 
       // Update the path to store the image with the correct filename
-      firebase_storage.Reference storageRef = firebase_storage.FirebaseStorage.instance
+      firebase_storage.Reference storageRef = firebase_storage
+          .FirebaseStorage.instance
           .ref()
           .child('user_photos')
           .child(filename);
       await storageRef.putFile(_image!);
       photoUrl = await storageRef.getDownloadURL();
-
 
       Navigator.pop(context); // Close the loading dialog
     } catch (e) {
@@ -110,9 +112,6 @@ class _RegisterPageState extends State<RegisterPage> {
       Navigator.pop(context); // Close the loading dialog
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +124,6 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 25),
-
                 const SizedBox(height: 25),
                 Text(
                   'Create Account',
@@ -135,7 +133,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 const SizedBox(height: 25),
-
                 GestureDetector(
                   onTap: getImage,
                   child: CircleAvatar(
@@ -143,19 +140,19 @@ class _RegisterPageState extends State<RegisterPage> {
                     backgroundColor: Colors.grey[300],
                     child: _image != null
                         ? ClipRRect(
-                      borderRadius: BorderRadius.circular(50),
-                      child: Image.file(
-                        _image!,
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
-                      ),
-                    )
+                            borderRadius: BorderRadius.circular(50),
+                            child: Image.file(
+                              _image!,
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          )
                         : const Icon(
-                      Icons.add_a_photo,
-                      size: 50,
-                      color: Colors.grey,
-                    ),
+                            Icons.add_a_photo,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
                   ),
                 ),
                 const SizedBox(height: 25),
